@@ -1,9 +1,9 @@
-##242 Valid Anagram
+## 242 Valid Anagram
 Given two strings s and t , write a function to determine if t is an anagram of s.
 
 Example 1:
 
->Input: s = "anagram", t = "nagaram"
+>Input: s = "anagram", t = "anagaram"
 Output: true
 Example 2:
 
@@ -23,7 +23,7 @@ What if the inputs contain unicode characters? How would you adapt your solution
 **Follow Up：**
 直接用hashmap存储
 
-```
+```java
 class Solution {
     // 时间复杂度是O(N)，空间复杂度是O(1)，因为最多也就26个英文字母
     // 也可以直接用26大小的int数组
@@ -49,7 +49,9 @@ class Solution {
 }
 ```
 
-##49. Group Anagrams
+
+
+## 49. Group Anagrams
 Given an array of strings strs, group the anagrams together. You can return the answer in any order.
 
 An Anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
@@ -69,7 +71,7 @@ Example 3:
 >Input: strs = ["a"]
 Output: [["a"]]
 
-```
+```java
 class Solution {
     // 时间复杂度和空间复杂度都是O(NK)，N是string个数，K是最长string的长度
     
