@@ -1,11 +1,11 @@
 - 树的 **层序遍历** 用队列queue，**深层遍历** 用 stack
-
 - 对于二叉树问题用“递归”的话，最好在终止条件之后，先将left和right的递归结果分别写出来，看在left和right是怎样进行递归的，这样更加清楚。之后可以再继续优化
 - 对于“满二叉树”，如果深度是d的话，那么节点个数就是**2^d - 1**
 - 对于 tree 的题目，要用递归的话，经常假设对于 subtree（左或者右），已经根据函数得到了结果，可以直接用
 - 对于存放结果的 List 数组或者其他数据结构，是作为全局变量还是每个递归函数内部的变量，如果对于每次递归含义和形式都一样，那就是内部的变量，例如 LC 257
 - 迭代时，可以用一个辅助 TreeNode p，帮助我们遍历整棵树
 - BST：（1）low 和 high 上下边界；（2）中序遍历 BST 的节点，是一个递增的序列
+- **在 Tree 的递归问题中，我们经常在递归函数递归过程中修改一个全局变量，比如 res，然而递归函数 return 的却是一个局部的解 （例如 124 题）**
 
 
 
@@ -731,4 +731,72 @@ class Solution {
 
 
 ## 450 Delete Node in a BST
+
+
+
+
+
+
+
+## 124. Binary Tree Maximum Path Sum
+
+Given a **non-empty** binary tree, find the maximum path sum.
+
+For this problem, a path is defined as any sequence of nodes from some starting node to any node in the tree along the parent-child connections. The path must contain **at least one node** and does not need to go through the root.
+
+**Example 1:**
+
+```
+Input: [1,2,3]
+
+       1
+      / \
+     2   3
+
+Output: 6
+```
+
+**Example 2:**
+
+```
+Input: [-10,9,20,null,null,15,7]
+
+   -10
+   / \
+  9  20
+    /  \
+   15   7
+
+Output: 42
+```
+
+
+
+
+
+~~~java
+class Solution {
+    // "递归函数返回值"就可以定义为以当前结点为根结点，到叶节点的最大路径之和
+    // 经过一个节点的最大路径 = max(其左孩子为顶点的最大路径, 0) + max(右孩子为顶点的最大路径, 0) + 该节点的值。
+    // 在dfs中改变要 return 的全局变量
+    // 时间复杂度 O(N)，空间复杂度 O(H)
+    
+    public int res;
+    
+    public int maxPathSum(TreeNode root) {
+        res = Integer.MIN_VALUE;
+        rootLeafMaxPath(root);
+        return res;
+    }
+    
+    
+    public int rootLeafMaxPath(TreeNode root) {
+        if(root == null) return 0;
+        int left = Math.max(rootLeafMaxPath(root.left), 0);  // 取 max 是因为如果左子树返回的解 < 0，那就不包含左树 
+        int right = Math.max(rootLeafMaxPath(root.right), 0);  // 同上
+        res = Math.max(res, left + right + root.val);
+        return Math.max(left, right) + root.val;  // 最后返回的时候，left 和 right 只能选一边和 root 组合
+    }
+}
+~~~
 

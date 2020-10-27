@@ -1494,3 +1494,339 @@ class CustomStack {
 }
 ~~~
 
+
+
+## 921. Minimum Add to Make Parentheses Valid
+
+Given a string `S` of `'('` and `')'` parentheses, we add the minimum number of parentheses ( `'('` or `')'`, and in any positions ) so that the resulting parentheses string is valid.
+
+Formally, a parentheses string is valid if and only if:
+
+- It is the empty string, or
+- It can be written as `AB` (`A` concatenated with `B`), where `A` and `B` are valid strings, or
+- It can be written as `(A)`, where `A` is a valid string.
+
+Given a parentheses string, return the minimum number of parentheses we must add to make the resulting string valid.
+
+ 
+
+**Example 1:**
+
+```
+Input: "())"
+Output: 1
+```
+
+**Example 2:**
+
+```
+Input: "((("
+Output: 3
+```
+
+**Example 3:**
+
+```
+Input: "()"
+Output: 0
+```
+
+**Example 4:**
+
+```
+Input: "()))(("
+Output: 4
+```
+
+ 
+
+**Note:**
+
+1. `S.length <= 1000`
+2. `S` only consists of `'('` and `')'` characters.
+
+
+
+~~~java
+class Solution {
+    public int minAddToMakeValid(String S) {
+        Stack<Character> stack = new Stack<>();
+        int res = 0;
+        
+        for(int i = 0; i < S.length(); i++) {
+            char cur = S.charAt(i);
+            if(cur == '(') {
+                stack.push(cur);
+            } else {
+                if(!stack.isEmpty()) {
+                    stack.pop();
+                    continue;
+                } else {
+                    res++;
+                }
+            }
+        }
+        
+        while(!stack.isEmpty()) {
+            res++;
+            stack.pop();
+        }
+        
+        return res;
+    }
+}
+~~~
+
+
+
+
+
+## 1019. Next Greater Node In Linked List
+
+We are given a linked list with `head` as the first node. Let's number the nodes in the list: `node_1, node_2, node_3, ...` etc.
+
+Each node may have a *next larger* **value**: for `node_i`, `next_larger(node_i)` is the `node_j.val` such that `j > i`, `node_j.val > node_i.val`, and `j` is the smallest possible choice. If such a `j` does not exist, the next larger value is `0`.
+
+Return an array of integers `answer`, where `answer[i] = next_larger(node_{i+1})`.
+
+Note that in the example **inputs** (not outputs) below, arrays such as `[2,1,5]` represent the serialization of a linked list with a head node value of 2, second node value of 1, and third node value of 5.
+
+ 
+
+**Example 1:**
+
+```
+Input: [2,1,5]
+Output: [5,5,0]
+```
+
+**Example 2:**
+
+```
+Input: [2,7,4,3,5]
+Output: [7,0,5,5,0]
+```
+
+**Example 3:**
+
+```
+Input: [1,7,5,1,9,2,5,1]
+Output: [7,9,9,9,0,5,0,0]
+```
+
+ 
+
+**Note:**
+
+1. `1 <= node.val <= 10^9` for each node in the linked list.
+2. The given list has length in the range `[0, 10000]`.
+
+
+
+~~~java
+class Solution {
+    public int[] nextLargerNodes(ListNode head) {
+        if(head == null)
+            return new int[]{};
+        Stack<int[]> stack = new Stack<>();
+        ListNode cur = head;
+        int len = 0;
+        while(cur != null) {
+            cur = cur.next;
+            len++;
+        }
+        int[] res = new int[len];
+        cur = head;
+        int i = 0;
+        while(cur != null) {
+            while(!stack.isEmpty() && stack.peek()[0] < cur.val) {
+                res[stack.pop()[1]] = cur.val;
+            }
+            stack.push(new int[]{cur.val, i});
+            i++;
+            cur = cur.next;
+        }
+        
+        return res;
+    }
+}
+~~~
+
+
+
+## 456. 132 Pattern
+
+Given an array of `n` integers `nums`, a **132 pattern** is a subsequence of three integers `nums[i]`, `nums[j]` and `nums[k]` such that `i < j < k` and `nums[i] < nums[k] < nums[j]`.
+
+Return *`true` if there is a **132 pattern** in `nums`, otherwise return `false`.*
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [1,2,3,4]
+Output: false
+Explanation: There is no 132 pattern in the sequence.
+```
+
+**Example 2:**
+
+```
+Input: nums = [3,1,4,2]
+Output: true
+Explanation: There is a 132 pattern in the sequence: [1, 4, 2].
+```
+
+**Example 3:**
+
+```
+Input: nums = [-1,3,2,0]
+Output: true
+Explanation: There are three 132 patterns in the sequence: [-1, 3, 2], [-1, 3, 0] and [-1, 2, 0].
+```
+
+ 
+
+**Constraints:**
+
+- `n == nums.length`
+- `1 <= n <= 3 * 104`
+- `-109 <= nums[i] <= 109`
+
+
+
+方法一：优化版 brute force，时间复杂度是 O（N^2）
+
+~~~java
+class Solution {
+    // 先固定一个数字，然后去遍历另外两个数字。我们先确定哪个数字呢，当然是最小的那个啦
+    // 我们维护一个变量 mn，初始化为整型最大值，然后在遍历数字的时候，每次用当前数字来更新 mn，然后我们判断，若 mn 为当前数字就跳过，因为需要找到数字j的位置，数字j是大于数字i的，mn 表示的就是数字i。这样数字i和数字j都确定了之后，就要来遍历数字k了，范围是从数组的最后一个位置到数字j之间，只要中间的任何一个数字满足题目要求的关系，就直接返回 true 即可
+    
+    public boolean find132pattern(int[] nums) {
+        int minVal = Integer.MAX_VALUE;
+        for(int j = 0; j < nums.length; j++) {
+            minVal = Math.min(minVal, nums[j]); // 更新最小值，nums[j]就是当前指定的最大值，同时找到 max 和 min
+            for(int k = j + 1; k < nums.length; k++) {
+                if(minVal < nums[k] && nums[k] < nums[j])
+                    return true;
+            }
+        }
+        return false;
+    }
+}
+~~~
+
+
+
+方法二：维护一个 third 变量和 stack
+
+我们在遍历的时候，**如果当前数字小于 third，即 pattern 132 中的1找到了，我们直接返回 true 即可**，因为已经找到了，注意我们应该**从后往前遍历数组**。如果**当前数字大于栈顶元素，那么我们将栈顶数字取出，赋值给 third，然后将该数字压入栈，这样保证了栈里的元素仍然都是大于 third 的，我们想要的顺序依旧存在**，进一步来说，栈里存放的都是可以维持坐标 second > third 的 second 值，其中的任何一个值都是大于当前的 third 值，如果有更大的值进来，那就等于形成了一个更优的 second > third 的这样一个组合，并且这时弹出的 third 值比以前的 third 值更大，为什么要保证 third 值更大，因为这样才可以更容易的满足当前的值 first 比 third 值小这个条件
+
+~~~java
+class Solution {   
+    // 我们维护一个栈和一个变量 third
+    // 其中 third 就是第三个数字，也是 pattern 132 中的 2，初始化为整型最小值
+    // 栈里面按顺序放所有大于 third 的数字，也是 pattern 132 中的 3
+    
+    public boolean find132pattern(int[] nums) {
+        Stack<Integer> stack = new Stack<>();
+        int third = Integer.MIN_VALUE;  // third 记录的是 132 中的 2 位置上的值
+        
+        for(int i = nums.length - 1; i >= 0; i--) {
+            if(nums[i] < third)  // 找到 1 位置上的值了
+                return true;
+            while(!stack.isEmpty() && stack.peek() < nums[i]) {  // 找到了一个更大的数可以放栈顶
+                third = stack.pop();
+            }
+            stack.push(nums[i]);
+        }
+        return false;
+    }
+}
+~~~
+
+
+
+
+
+## 1190. Reverse Substrings Between Each Pair of Parentheses
+
+You are given a string `s` that consists of lower case English letters and brackets. 
+
+Reverse the strings in each pair of matching parentheses, starting from the innermost one.
+
+Your result should **not** contain any brackets.
+
+ 
+
+**Example 1:**
+
+```
+Input: s = "(abcd)"
+Output: "dcba"
+```
+
+**Example 2:**
+
+```
+Input: s = "(u(love)i)"
+Output: "iloveu"
+Explanation: The substring "love" is reversed first, then the whole string is reversed.
+```
+
+**Example 3:**
+
+```
+Input: s = "(ed(et(oc))el)"
+Output: "leetcode"
+Explanation: First, we reverse the substring "oc", then "etco", and finally, the whole string.
+```
+
+**Example 4:**
+
+```
+Input: s = "a(bcdefghijkl(mno)p)q"
+Output: "apmnolkjihgfedcbq"
+```
+
+ 
+
+**Constraints:**
+
+- `0 <= s.length <= 2000`
+- `s` only contains lower case English characters and parentheses.
+- It's guaranteed that all parentheses are balanced.
+
+
+
+定义一个全局的 res 变量，并且在最后也会返回这个 res 变量
+
+~~~java
+class Solution {
+    public String reverseParentheses(String s) {
+        Stack<String> stack = new Stack<>();
+        int n = s.length();
+        String res = "";
+        
+        for(int i = 0; i < n; i++) {
+            char cur = s.charAt(i);
+            if(cur >= 'a' && cur <= 'z') {
+                res += cur;
+            }
+            if(cur == '(') {   // 遇到 open bracket 才 push 到栈中
+                stack.push(res);
+                res = "";
+            } else if(cur == ')') {  // 遇到 close bracket 就从栈中不断地弹出前面的 string 拼接
+                String p = stack.pop();
+                String r = new StringBuilder(res).reverse().toString();
+                res = p + r; 
+            }
+        }
+        return res;
+    }
+}
+~~~
+
+
+
